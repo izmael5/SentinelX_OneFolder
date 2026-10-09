@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#06100e" />
+  <title>SentinelX Security Operations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="rail">
+      <div class="brand"><span class="brand-mark">S/</span><span class="brand-name">Sentinel<span>X</span></span></div>
+      <div class="rail-status"><span class="status-dot"></span><span>Control plane online</span></div>
+      <nav class="nav" aria-label="Primary navigation">
+        <button class="nav-item active" data-view="overview"><span>01</span> Overview</button>
+        <button class="nav-item" data-view="targets"><span>02</span> Targets</button>
+        <button class="nav-item" data-view="findings"><span>03</span> Findings</button>
+        <button class="nav-item" data-view="research"><span>04</span> Research</button>
+      </nav>
+      <div class="rail-foot"><span class="mono">SCOPE / AUTHORIZED ONLY</span><span class="mono">v0.1.0</span></div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div><p class="eyebrow">SECURITY OPERATIONS / LIVE</p><h1 id="page-title">Overview</h1></div>
+        <div class="top-actions"><span id="live-state" class="live-chip"><span class="status-dot"></span> connecting</span><button class="icon-button" id="refresh-btn" aria-label="Refresh data">↻</button></div>
+      </header>
+
+      <section class="scope-banner"><div class="scope-icon">✓</div><div><strong>Authorized scope is enforced.</strong><p>Assessments only run against enabled targets with an explicit authorization reference. Checks are non-destructive by default.</p></div><span class="mono scope-code">ALLOWLIST / ON</span></section>
+
+      <section id="view-overview" class="view active">
+        <div class="hero-line"><div><p class="eyebrow">CURRENT OPERATING PICTURE</p><h2>Signal before noise.</h2><p class="hero-copy">Track the systems you are trusted to defend, see what changed, and move evidence into the right queue.</p></div><div class="hero-badge"><span class="badge-kicker">LIVE RISK</span><strong id="hero-risk">--</strong><span>weighted posture score</span></div></div>
+        <div class="metric-grid">
+          <article class="metric-card accent"><span class="metric-label">REGISTERED TARGETS</span><strong id="metric-targets">0</strong><span id="metric-targets-note">0 enabled in scope</span></article>
+          <article class="metric-card"><span class="metric-label">OPEN FINDINGS</span><strong id="metric-findings">0</strong><span>evidence-backed observations</span></article>
+          <article class="metric-card"><span class="metric-label">COMPLETED CHECKS</span><strong id="metric-scans">0</strong><span>safe posture assessments</span></article>
+          <article class="metric-card"><span class="metric-label">LIVE STREAM</span><strong id="metric-stream">--</strong><span>audit events over WebSocket</span></article>
+        </div>
+        <div class="content-grid">
+          <article class="panel event-panel"><div class="panel-head"><div><p class="eyebrow">EVENT STREAM</p><h3>Latest telemetry</h3></div><span class="panel-tag">REAL TIME</span></div><div id="event-list" class="event-list"><div class="empty-state">Waiting for audit events…</div></div></article>
+          <article class="panel"><div class="panel-head"><div><p class="eyebrow">RISK DISTRIBUTION</p><h3>Findings by severity</h3></div></div><div id="severity-chart" class="severity-chart"></div><div class="chart-legend"><span><i class="dot coral"></i> high impact</span><span><i class="dot amber"></i> attention</span><span><i class="dot mint"></i> informational</span></div></article>
+        </div>
+      </section>
+
+      <section id="view-targets" class="view">
+        <div class="section-intro"><div><p class="eyebrow">AUTHORIZED ASSET REGISTRY</p><h2>Targets</h2><p>Every check starts with a target record and an authorization reference.</p></div><span class="scope-code mono">SCOPE / EXPLICIT</span></div>
+        <div class="split-grid"><article class="panel form-panel"><div class="panel-head"><div><p class="eyebrow">REGISTER A SYSTEM</p><h3>New target</h3></div></div><form id="target-form"><label>Name<input required name="name" placeholder="Production web / primary" /></label><label>Type<select name="kind"><option value="website">Website</option><option value="network">Network</option></select></label><label>URL or entry point<input required type="url" name="url" placeholder="https://example.com" /></label><label>Authorization reference<input required name="authorization_ref" placeholder="Ticket, contract, or owner note" /></label><label>Scope notes<textarea required name="scope_notes" rows="4" placeholder="What is permitted, excluded, and when?"></textarea></label><button class="primary-button" type="submit">Add to authorized scope <span>→</span></button><p id="target-form-status" class="form-status"></p></form></article><article class="panel"><div class="panel-head"><div><p class="eyebrow">ALLOWLIST</p><h3>Registered targets</h3></div><span id="target-count" class="panel-tag">0</span></div><div id="target-list" class="target-list"></div></article></div>
+      </section>
+
+      <section id="view-findings" class="view">
+        <div class="section-intro"><div><p class="eyebrow">EVIDENCE QUEUE</p><h2>Findings</h2><p>Prioritize by impact and confidence. Resolve only when the evidence is closed.</p></div><select id="finding-filter" class="compact-select"><option value="">All states</option><option value="open">Open</option><option value="acknowledged">Acknowledged</option><option value="resolved">Resolved</option></select></div><div id="finding-list" class="finding-list"></div>
+      </section>
+
+      <section id="view-research" class="view">
+        <div class="section-intro"><div><p class="eyebrow">DEFENSIVE RESEARCH DESK</p><h2>Research</h2><p>Ask for evidence-led context and remediation ideas. Research never triggers an action.</p></div></div><div class="research-layout"><article class="panel form-panel"><form id="research-form"><label>Question<textarea required name="question" rows="8" placeholder="How should I verify and remediate this observation safely?"></textarea></label><label>Context target<select name="target_id" id="research-target"><option value="">No specific target</option></select></label><button class="primary-button" type="submit">Generate defensive brief <span>→</span></button><p id="research-status" class="form-status"></p></form></article><article class="panel research-output"><div class="panel-head"><div><p class="eyebrow">ADVISORY OUTPUT</p><h3>Brief</h3></div><span class="panel-tag">NON-ACTIONABLE</span></div><pre id="research-output">Your research brief will appear here.</pre></article></div>
+      </section>
+    </main>
+  </div>
+  <div id="toast" class="toast" role="status"></div>
+  <script src="/app.js" defer></script>
+</body>
+</html>

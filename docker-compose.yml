@@ -1,0 +1,37 @@
+services:
+  db:
+    image: mysql:8.4
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_DATABASE: sentinelx
+      MYSQL_USER: sentinelx
+      MYSQL_PASSWORD: sentinelx
+      MYSQL_ROOT_PASSWORD: change-me-in-local-env
+    volumes:
+      - sentinelx_mysql:/var/lib/mysql
+      - ./backend/migrations/001_initial.sql:/docker-entrypoint-initdb.d/001_initial.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "sentinelx", "-psentinelx"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  app:
+    build: .
+    environment:
+      PORT: 3000
+      DATABASE_URL: mysql+pymysql://sentinelx:sentinelx@db:3306/sentinelx
+      MANUS_API_URL: ${MANUS_API_URL:-}
+      MANUS_API_KEY: ${MANUS_API_KEY:-}
+      MANUS_PROJECT_ID: ${MANUS_PROJECT_ID:-}
+      MANUS_OAUTH_PORTAL_URL: ${MANUS_OAUTH_PORTAL_URL:-}
+      MANUS_OAUTH_API_URL: ${MANUS_OAUTH_API_URL:-}
+      MANUS_JWT_SECRET: ${MANUS_JWT_SECRET:-}
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  sentinelx_mysql:
